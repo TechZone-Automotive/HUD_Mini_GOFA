@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>GOFA HUD Mini - TechZone Automotive</title>
+    <meta name="description" content="Công cụ cập nhật và cấu hình thiết bị GOFA HUD Mini trực tiếp qua trình duyệt web.">
+    
+    <!-- Import esp-web-tools -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+    
+    <style>
+        /* COLOR PALETTE - DARK THEME (FLAT & MODERN) */
+        :root {
+            --bg-color: #0b1120;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --border: #334155;
+            --border-hover: #475569;
+            --radius-card: 16px;
+            --radius-element: 8px;
+            
+            --info-bg: rgba(59, 130, 246, 0.1);
+            --info-border: rgba(59, 130, 246, 0.4);
+            --info-text: #bfdbfe;
+            
+            --warn-bg: rgba(234, 179, 8, 0.1);
+            --warn-border: rgba(234, 179, 8, 0.4);
+            --warn-text: #fef08a;
+            
+            --success-bg: rgba(34, 197, 94, 0.1);
+            --success-border: rgba(34, 197, 94, 0.4);
+            --success-text: #bbf7d0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        
+        /* HEADINGS */
+        h1 {
+            color: var(--text-main);
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 15px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+        
+        /* ALERTS / BOXES */
+        .alert-box {
+            padding: 16px 20px;
+            border-radius: var(--radius-element);
+            border: 1px solid;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .warning-box { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+        .info-box { background: var(--info-bg); border-color: var(--info-border); color: var(--info-text); }
+        .success-box { background: var(--success-bg); border-color: var(--success-border); color: var(--success-text); }
+        .success-box.hidden { display: none !important; }
+
+        /* CARDS */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+        
+        /* TUTORIAL SECTIONS */
+        .tutorial-step {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .tutorial-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .tutorial-step h4 {
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tutorial-step ul, .tutorial-step ol {
+            margin-left: 24px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .tutorial-step li {
+            margin-bottom: 8px;
+        }
+        .tutorial-step li strong {
+            color: var(--text-main);
+        }
+
+        /* ACTION BUTTONS */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 24px 0;
+            width: 100%;
+        }
+        
+        esp-web-install-button {
+            display: block;
+            width: 100%;
+        }
+        
+        .install-btn, .ota-btn {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-radius: var(--radius-element);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .install-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: 1px solid transparent;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+        .install-btn:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .ota-btn {
+            background: transparent;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-hover);
+        }
+        .ota-btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+        }
+        
+        /* STANDARD BUTTONS */
+        button.standard-btn {
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius-element);
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        button.standard-btn:hover { background: #cbd5e1; }
+        button.standard-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+        
+        button.outline-btn {
+            background: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-hover);
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button.outline-btn:hover { background: var(--surface-hover); border-color: var(--text-muted); }
+
+        /* FORM ELEMENTS */
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-family: inherit;
+            transition: border-color 0.2s;
+            appearance: none;
+        }
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        select option { background-color: var(--bg-color); color: var(--text-main); }
+        select:focus, input[type="text"]:focus { outline: none; border-color: var(--primary); }
+        
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 13px;
+            resize: vertical;
+            background: var(--bg-color);
+            color: var(--text-muted);
+        }
+        textarea:focus { outline: none; border-color: var(--primary); }
+        
+        /* CONFIG SECTIONS */
+        .status-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: inline-block;
+        }
+        
+        .config-section {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--primary);
+            padding: 24px;
+            border-radius: var(--radius-element);
+            margin-bottom: 16px;
+        }
+        
+        .config-section p { color: var(--text-muted); font-size: 14px; margin-bottom: 16px; }
+        
+        .config-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 80px;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .config-row label {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        
+        @media (max-width: 640px) {
+            .config-row { grid-template-columns: 1fr; gap: 8px; }
+            .config-row label { text-align: left; }
+            .config-row button { width: 100%; padding: 12px; }
+        }
+        
+        #versionDisplay {
+            background: var(--surface);
+            border: 1px dashed var(--border-hover);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        /* ACCORDION */
+        .accordion-btn {
+            background: var(--surface);
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            text-align: left;
+            border: 1px dashed var(--border-hover);
+            outline: none;
+            transition: 0.3s;
+            border-radius: var(--radius-element);
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .accordion-btn:hover { background: var(--surface-hover); border-color: var(--primary); }
+        .accordion-content {
+            padding: 0 18px;
+            background-color: transparent;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease;
+            border-radius: 0 0 var(--radius-element) var(--radius-element);
+            margin-bottom: 16px;
+        }
+        .accordion-content.active {
+            max-height: 1200px; 
+            padding: 10px 0 20px 0;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 40px 0 20px 0;
+            color: var(--text-muted);
+        }
+        .footer-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .footer-tagline { font-size: 13px; margin-bottom: 20px; }
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        .footer-social a {
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            transition: all 0.2s;
+        }
+        .footer-social a:hover { background: var(--bg-color); border-color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Cập nhật & Cấu hình HUD Mini</h1>
+        <p class="subtitle">Công cụ Quản lý Firmware và Thiết lập thông số GOFA HUD trực tiếp trên Web</p>
+        
+        <div class="alert-box warning-box">
+            <strong>Yêu cầu hệ thống:</strong> Sử dụng trình duyệt Chrome, Edge hoặc Brave trên máy tính (Windows/Mac). Safari và thiết bị di động không hỗ trợ tính năng kết nối qua cáp này.
+        </div>
+
+        <!-- ============================================== -->
+        <!-- PHẦN 1: SERIAL CONFIG (ĐƯA LÊN ĐẦU TIÊN)       -->
+        <!-- ============================================== -->
+        <div class="card">
+            <h2>⚙️ Cấu hình thiết bị & Lấy MAC</h2>
+            <div class="alert-box info-box" style="margin-bottom: 20px;">
+                Cắm cáp USB vào HUD. Nút Cấu hình và Cập nhật Firmware dùng chung cổng kết nối. Nếu bạn vừa cập nhật phần mềm xong, hãy đóng thông báo cài đặt trước khi Kết nối Serial.
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+                <button id="btnConnect" class="standard-btn">🔌 Kết nối Serial</button>
+                <div id="status" class="status-box" style="margin: 0;">Trạng thái: Chưa kết nối</div>
+            </div>
+            
+            <div id="config-controls" style="display: none; margin-top: 32px;">
+                
+                <!-- ĐỌC VÀ ĐĂNG KÝ MAC GOFA -->
+                <div class="config-section">
+                    <h3>Đọc & Đăng ký MAC GOFA</h3>
+                    <p>Lấy địa chỉ MAC của HUD để đăng ký sử dụng HUD GOFA.</p>
+                    <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                        <button id="btnReadMAC" class="outline-btn" style="white-space: nowrap; height: 44px; padding: 0 20px;">Đọc MAC</button>
+                        <input type="text" id="macDisplay" readonly placeholder="Chưa có dữ liệu MAC" style="text-align: center; font-weight: bold; font-size: 16px;">
+                    </div>
+                    
+                    <div class="tutorial-step" style="border: none; padding-bottom: 0; margin-bottom: 16px;">
+                        <ul style="margin-bottom: 0;">
+                            <li>Chọn <strong>Đăng nhập với Google</strong>.</li>
+                            <li>Nhập MAC Bluetooth của HUD vào trường MAC address (MAC sẽ được tự động copy sau khi Đọc).</li>
+                            <li>Chọn <strong>Đăng ký MAC</strong> và chờ hệ thống xử lý.</li>
+                            <li>Chỉ chuyển sang bước tích hợp khi giao diện hiển thị đăng ký thành công.</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="https://hud.platform.gofa.vn/guest/register" target="_blank" class="install-btn" style="padding: 12px; font-size: 14px;">ĐĂNG KÝ MAC GOFA</a>
+                </div>
+
+                <!-- 1. VERSION CHECK -->
+                <div class="config-section">
+                    <h3>Kiểm tra phiên bản Firmware</h3>
+                    <button id="btnCheckVersion" class="outline-btn">Gửi lệnh kiểm tra</button>
+                    <div id="versionDisplay">Chưa rõ phiên bản</div>
+                </div>
+                
+                <!-- 2. SCREEN ROTATION -->
+                <div class="config-section">
+                    <h3>Xoay màn hình</h3>
+                    <p>Chỉnh hướng hiển thị hình ảnh sao cho thuận mắt. Hướng 1-4 là xoay phẳng, 5-8 là lật ngược để hắt kính lái.</p>
+                    <div class="config-row">
+                        <label>Chọn hướng</label>
+                        <select id="selRotation">
+                            <option value="1">Hướng 1</option>
+                            <option value="2">Hướng 2</option>
+                            <option value="3">Hướng 3</option>
+                            <option value="4">Hướng 4</option>
+                            <option value="5">Hướng 5</option>
+                            <option value="6">Hướng 6</option>
+                            <option value="7">Hướng 7</option>
+                            <option value="8">Hướng 8</option>
+                        </select>
+                        <button id="btnRotation" class="outline-btn">Lưu</button>
+                    </div>
+                </div>
+                
+                <!-- 3. UI SELECTION -->
+                <div class="config-section">
+                    <h3>Giao diện hiển thị (UI)</h3>
+                    <p>Thay đổi kiểu Giao diện tốc độ trên màn hình HUD.</p>
+                    <div class="config-row">
+                        <label>Mẫu giao diện</label>
+                        <select id="selUI">
+                            <option value="U1">Giao diện 1</option>
+                            <option value="U2">Giao diện 2</option>
+                            <option value="U3">Giao diện 3</option>
+                            <option value="U4">Giao diện 4</option>
+                            <option value="U5">Giao diện 5</option>
+                            <option value="U6">Giao diện 6</option>
+                        </select>
+                        <button id="btnUI" class="outline-btn">Lưu</button>
+                    </div>
+                </div>
+                
+                <!-- 4. SPEED LIMIT WARNING -->
+                <div class="config-section">
+                    <h3>Cảnh báo tốc độ</h3>
+                    <p>Cài đặt độ lệch cảnh báo quá tốc độ: Báo sớm (-km/h) hoặc Báo trễ (+km/h).</p>
+                    <div class="config-row">
+                        <label>Ngưỡng lệch</label>
+                        <select id="selSpeed">
+                            <option value="-5">-5 km/h (Báo sớm)</option>
+                            <option value="-3">-3 km/h (Báo sớm)</option>
+                            <option value="0" selected>0 km/h (Chính xác)</option>
+                            <option value="3">+3 km/h (Báo trễ)</option>
+                            <option value="5">+5 km/h (Báo trễ)</option>
+                        </select>
+                        <button id="btnSpeed" class="outline-btn">Lưu</button>
+                    </div>
+                </div>
+                
+                <!-- 5. TERMINAL -->
+                <div class="config-section">
+                    <h3>Terminal (Gỡ lỗi)</h3>
+                    <div style="display: flex; gap: 12px;">
+                        <input type="text" id="customCmd" placeholder="Nhập lệnh (VD: VERSION, MAC)">
+                        <button id="btnSendCmd" class="outline-btn" style="white-space: nowrap; height: 44px;">Gửi lệnh</button>
+                    </div>
+                </div>
+                
+                <!-- 6. LOG -->
+                <div style="margin-top: 32px;">
+                    <h3 style="margin-bottom: 8px;">Nhật ký phản hồi</h3>
+                    <textarea id="serialLog" readonly placeholder="Phản hồi từ thiết bị sẽ hiển thị tại đây..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- PHẦN 2: CẬP NHẬT QUA CÁP USB (MẶC ĐỊNH V2)      -->
+        <!-- ============================================== -->
+        <div class="card">
+            <h2>📦 Cập nhật Firmware</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Tính năng này sẽ nạp phần mềm mới nhất cho thiết bị <strong>GOFA HUD Mini V2 (Mặt kính tròn)</strong> thông qua cáp USB Type-C.</p>
+            
+            <div class="action-buttons" style="margin-top: 0;">
+                <!-- Nút nạp trực tiếp file V2 -->
+                <esp-web-install-button manifest="manifest_v2.json">
+                    <button slot="activate" class="install-btn" id="installBtn">⚡ CÀI ĐẶT FIRMWARE QUA CÁP</button>
+                </esp-web-install-button>
+                
+                <!-- Thêm nút tải file OTA V2 vào khu vực này -->
+                <a href="firmware-V2-GOFA-OTA.bin" class="ota-btn" download>⬇️ TẢI FILE FIRMWARE OTA (.BIN)</a>
+            </div>
+            
+            <div class="alert-box success-box hidden" id="success-message">
+                <strong>Cập nhật thành công!</strong> HUD sẽ tự khởi động lại. Đợi màn hình HUD lên hình rồi mới kéo lên phần Cấu hình Serial để thiết lập.
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- PHẦN 3: HƯỚNG DẪN CÀI ĐẶT (GOM GỌN BẰNG ACCORDION) -->
+        <!-- ============================================== -->
+        <div style="margin-bottom: 24px;">
+            <!-- Accordion USB -->
+            <button class="accordion-btn" onclick="toggleAccordion('usbAccordion', this)">
+                📖 Hướng dẫn cập nhật Firmware qua cáp USB <span>▼</span>
+            </button>
+            <div class="accordion-content" id="usbAccordion">
+                <div class="card" style="margin-bottom: 0; box-shadow: none; border-radius: 0 0 8px 8px; border-top: none;">
+                    <div class="tutorial-step">
+                        <h4>1️⃣ Chuẩn bị kết nối</h4>
+                        <ul>
+                            <li>Dùng <strong>cáp USB Type-C loại truyền được dữ liệu</strong> (những cáp kém chất lượng thường chỉ sạc được, không truyền được data).</li>
+                            <li>Cắm trực tiếp cáp từ thiết bị HUD Mini vào cổng USB của máy tính (Tránh dùng qua Hub USB kém chất lượng).</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step">
+                        <h4>2️⃣ Cách Flash Firmware (Cập nhật phần mềm)</h4>
+                        <ol>
+                            <li>Cuộn lên mục <strong>Cập nhật Firmware</strong> ở trên.</li>
+                            <li>Nhấn nút <strong>⚡ CÀI ĐẶT FIRMWARE QUA CÁP</strong>.</li>
+                            <li>Một cửa sổ nhỏ góc trái trình duyệt sẽ hiện ra. Bạn tìm cổng ghi tên như <code>USB-SERIAL CH340</code>, <code>CP210x</code> hoặc <code>CH9102</code>, chọn nó và bấm <strong>Connect (Kết nối)</strong>.</li>
+                            <li>Bấm Install và đợi khoảng 1-2 phút cho đến khi báo hoàn thành. <strong>Tuyệt đối không rút cáp trong lúc chạy.</strong></li>
+                        </ol>
+                    </div>
+                    <div class="tutorial-step" style="border: none; margin-bottom: 0; padding-bottom: 0;">
+                        <h4>3️⃣ Xử lý khi không tìm thấy cổng COM</h4>
+                        <ul>
+                            <li>Nếu mở bảng kết nối ra mà trống trơn, 90% là do dây cáp của bạn không hỗ trợ truyền dữ liệu. Hãy đổi dây cáp khác.</li>
+                            <li>Nếu dây cáp chuẩn nhưng vẫn không thấy, máy tính của bạn có thể thiếu Driver. <a href="https://drive.google.com/file/d/1mxIa3mzsWyAXhIbco931gy7lPy6j_81X/view?usp=drive_link" target="_blank" style="color: var(--primary); text-decoration: underline;">Tải Driver CH340 tại đây</a>, cài đặt và khởi động lại trình duyệt.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion WiFi -->
+            <button class="accordion-btn" onclick="toggleAccordion('wifiAccordion', this)">
+                📖 Hướng dẫn cập nhật OTA qua WiFi (Điện thoại/PC) <span>▼</span>
+            </button>
+            <div class="accordion-content" id="wifiAccordion">
+                <div class="card" style="margin-bottom: 0; box-shadow: none; border-radius: 0 0 8px 8px; border-top: none;">
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Nếu không có máy tính hoặc cáp truyền dữ liệu, bạn có thể cập nhật bằng sóng WiFi phát ra từ HUD.</p>
+                    <div class="tutorial-step">
+                        <h4>Bước 1: Tải file Firmware về máy</h4>
+                        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">Lưu file Firmware OTA (.bin) vào thư mục dễ tìm trên Điện thoại hoặc Máy tính của bạn.</p>
+                    </div>
+                    <div class="tutorial-step">
+                        <h4>Bước 2: Kết nối WiFi của HUD</h4>
+                        <ul>
+                            <li>Cấp nguồn cho HUD sáng lên.</li>
+                            <li>Dùng điện thoại/PC bắt WiFi tên: <strong>HUD_Mini_V2</strong> (Mật khẩu: <strong>12345678</strong>).</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step" style="border: none; margin-bottom: 0; padding-bottom: 0;">
+                        <h4>Bước 3: Truy cập Chế độ cập nhật</h4>
+                        <ul>
+                            <li>Khi bắt WiFi, mở trình duyệt truy cập <code>192.168.4.1</code>).</li>
+                            <li>Bấm nút xanh <strong>"VÀO WIFI MODE"</strong>. HUD sẽ tắt màn hình và chuyển sang trạng thái chờ cập nhật.</li>
+                            <li>Sau khoảng 2-3 giây, dùng điện thoại bắt lại sóng WiFi <strong>HUD_Mini_V2</strong> một lần nữa.</li>
+                            <li>Lúc này, trình duyệt sẽ hiện ra trang nạp Firmware và Cấu hình. Bấm "Cập nhật" - "Chọn tệp", tìm đến file <code>.bin</code> vừa tải ở Bước 1 và nhấn <strong>Tiến hành nạp Firmware</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- PHẦN 4: MỤC DÀNH CHO V1 (ẨN GỌN XUỐNG CUỐI)    -->
+        <!-- ============================================== -->
+        <div style="margin-bottom: 24px;">
+            <button class="accordion-btn" onclick="toggleAccordion('v1AccordionContent', this)" style="border-color: transparent; background: transparent; justify-content: center; gap: 10px;">
+                Khu vực tải phần mềm cho người dùng HUD Mini V1 (Mạch vuông) <span>▼</span>
+            </button>
+            <div class="accordion-content" id="v1AccordionContent">
+                <div class="card" style="box-shadow: none; border-radius: 8px;">
+                    <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">Chỉ nạp phiên bản này nếu HUD của bạn là thiết kế hộp chữ nhật vuông vức bản cũ.</p>
+                    <div class="action-buttons" style="margin: 0;">
+                        <esp-web-install-button manifest="manifest_v1.json">
+                            <button slot="activate" class="install-btn" style="background: #475569;">⚡ CÀI ĐẶT FIRMWARE V1 QUA CÁP</button>
+                        </esp-web-install-button>
+                        <a href="firmware-V1-GOFA-OTA.bin" class="ota-btn" download>⬇️ TẢI FILE FIRMWARE V1 (OTA)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="footer-brand">TechZone Automotive</div>
+            <div class="footer-tagline">Car Coding & Retrofit</div>
+            <div class="footer-social">
+                <a href="https://facebook.com/49techzone" target="_blank" rel="noopener">Facebook</a>
+                <a href="https://tiktok.com/@techzone_automotive" target="_blank" rel="noopener">TikTok</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== TÍNH NĂNG ACCORDION (DÙNG CHUNG) ====================
+        function toggleAccordion(contentId, btnElement) {
+            const content = document.getElementById(contentId);
+            content.classList.toggle("active");
+            
+            if (content.classList.contains("active")) {
+                btnElement.innerHTML = btnElement.innerHTML.replace('▼', '▲');
+            } else {
+                btnElement.innerHTML = btnElement.innerHTML.replace('▲', '▼');
+            }
+        }
+
+        // ==================== EVENT LISTENER CHO NÚT FLASH ====================
+        document.querySelectorAll('esp-web-install-button button[slot="activate"]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (port) {
+                    await disconnectSerial();
+                    alert('Hệ thống đã tự động ngắt kết nối cấu hình để thực hiện nạp Firmware. Vui lòng chọn cổng COM trong cửa sổ hiện ra.');
+                }
+            }, true);
+        });
+
+        document.querySelectorAll('esp-web-install-button').forEach(el => {
+            el.addEventListener('install-finished', () => {
+                const msg = document.getElementById('success-message');
+                msg.classList.remove('hidden');
+                setTimeout(() => { msg.classList.add('hidden'); }, 15000);
+            });
+        });
+        
+        // ==================== SERIAL COMMUNICATION ====================
+        let port, reader, writer;
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+        
+        function log(text, direction = 'info') {
+            const logArea = document.getElementById('serialLog');
+            const prefix = direction === 'in' ? '> ' : direction === 'out' ? '< ' : '';
+            logArea.value += prefix + text;
+            if (!text.endsWith('\n')) logArea.value += '\n';
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        async function writeSerial(data) {
+            if (!writer) {
+                alert('Vui lòng bấm Kết nối Serial trước khi gửi lệnh!');
+                return;
+            }
+            try {
+                await writer.write(encoder.encode(data));
+                log(data.trim(), 'out');
+            } catch (err) {
+                log(`Lỗi: ${err.message}`, 'err');
+            }
+        }
+        
+        async function disconnectSerial() {
+            const btn = document.getElementById('btnConnect');
+            const status = document.getElementById('status');
+            const controls = document.getElementById('config-controls');
+            
+            try {
+                if (reader) { await reader.cancel().catch(()=>{}); reader.releaseLock(); reader = null; }
+                if (writer) { writer.releaseLock(); writer = null; }
+                if (port) { await port.close().catch(()=>{}); port = null; }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                port = null; reader = null; writer = null;
+                btn.textContent = '🔌 Kết nối Serial';
+                btn.disabled = false;
+                status.textContent = 'Trạng thái: Chưa kết nối';
+                status.style.borderColor = 'var(--border)';
+                status.style.color = 'var(--text-muted)';
+                controls.style.display = 'none';
+            }
+        }
+        
+        document.getElementById('btnConnect').addEventListener('click', async () => {
+            const btn = document.getElementById('btnConnect');
+            const status = document.getElementById('status');
+            const controls = document.getElementById('config-controls');
+            
+            if (port) {
+                await disconnectSerial();
+            } else {
+                try {
+                    btn.disabled = true;
+                    status.textContent = 'Trạng thái: Đang kết nối...';
+                    
+                    port = await navigator.serial.requestPort();
+                    await port.open({ baudRate: 115200 });
+                    writer = port.writable.getWriter();
+                    reader = port.readable.getReader();
+                    
+                    btn.textContent = 'Ngắt kết nối';
+                    btn.disabled = false;
+                    status.textContent = 'Trạng thái: Đã kết nối ✅';
+                    status.style.borderColor = 'var(--success-border)';
+                    status.style.color = 'var(--success-text)';
+                    controls.style.display = 'block';
+                    document.getElementById('serialLog').value = '';
+                    document.getElementById('versionDisplay').textContent = 'Chưa rõ phiên bản';
+                    document.getElementById('macDisplay').value = '';
+                    document.getElementById('macDisplay').style.borderColor = 'var(--border)';
+                    
+                    (async () => {
+                        let readBuffer = ''; // FIX: Thêm bộ đệm để chống cắt chữ khi stream dữ liệu
+                        try {
+                            while (true) {
+                                const { value, done } = await reader.read();
+                                if (done) break;
+                                
+                                readBuffer += decoder.decode(value, { stream: true });
+                                let lines = readBuffer.split('\n');
+                                readBuffer = lines.pop(); // Giữ lại phần chưa hoàn chỉnh (không có \n)
+                                
+                                for (let line of lines) {
+                                    log(line, 'in'); // In log từng dòng hoàn chỉnh
+                                    
+                                    // FIX VERSION: Nhận diện mọi tiền tố (V, G) hoặc không có tiền tố
+                                    const versionMatch = line.match(/[a-zA-Z]?\d+\.\d+\.\d+/);
+                                    if (versionMatch) {
+                                        const vDisp = document.getElementById('versionDisplay');
+                                        vDisp.textContent = `Thiết bị đang chạy: ${versionMatch[0]}`;
+                                        vDisp.style.borderColor = 'var(--success-border)';
+                                        vDisp.style.color = 'var(--success-text)';
+                                        vDisp.style.background = 'var(--success-bg)';
+                                    }
+
+                                    // Bắt thông tin MAC Address để hiển thị & Auto Copy
+                                    const macMatch = line.match(/MAC:\s*([0-9A-F:]+)/i);
+                                    if (macMatch) {
+                                        const macAddress = macMatch[1];
+                                        const macDisp = document.getElementById('macDisplay');
+                                        macDisp.value = macAddress;
+                                        macDisp.style.borderColor = 'var(--success-border)';
+                                        macDisp.style.color = 'var(--success-text)';
+                                        macDisp.style.background = 'var(--success-bg)';
+
+                                        // Tự động Copy vào khay nhớ tạm
+                                        try {
+                                            await navigator.clipboard.writeText(macAddress);
+                                            const btnReadMAC = document.getElementById('btnReadMAC');
+                                            const originalText = btnReadMAC.textContent;
+                                            btnReadMAC.textContent = 'Đã Copy!';
+                                            btnReadMAC.style.background = 'var(--success-bg)';
+                                            btnReadMAC.style.color = 'var(--success-text)';
+                                            btnReadMAC.style.borderColor = 'var(--success-border)';
+                                            
+                                            setTimeout(() => {
+                                                btnReadMAC.textContent = originalText;
+                                                btnReadMAC.style.background = 'var(--surface)';
+                                                btnReadMAC.style.color = 'var(--text-main)';
+                                                btnReadMAC.style.borderColor = 'var(--border-hover)';
+                                            }, 3000);
+                                        } catch (clipboardErr) {
+                                            console.log("Trình duyệt chặn auto-copy, người dùng có thể tự copy thủ công.");
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            if (port) {
+                                log(`Mất kết nối: ${err.message}`, 'err');
+                                await disconnectSerial();
+                            }
+                        }
+                    })();
+                } catch (err) {
+                    await disconnectSerial();
+                    if (err.name === 'NotFoundError') {
+                        alert('Không tìm thấy cổng COM.\nHãy kiểm tra lại cáp kết nối USB hoặc đảm bảo bạn đã chọn đúng thiết bị.');
+                    } else if (err.name === 'InvalidStateError') {
+                        alert('Cổng COM đang bị chiếm dụng.\nHãy đóng bảng cài đặt Firmware, rút cáp ra, đợi 5 giây rồi cắm lại để khởi động lại tiến trình.');
+                    } else {
+                        alert(`Lỗi kết nối: ${err.message}`);
+                    }
+                }
+            }
+        });
+        
+        // ==================== COMMAND BUTTONS ====================
+        document.getElementById('btnReadMAC').addEventListener('click', () => {
+            document.getElementById('macDisplay').value = 'Đang đọc...';
+            document.getElementById('macDisplay').style.color = 'var(--text-main)';
+            writeSerial('MAC\n');
+        });
+
+        document.getElementById('btnCheckVersion').addEventListener('click', () => {
+            document.getElementById('versionDisplay').textContent = 'Đang đọc dữ liệu...';
+            writeSerial('VERSION\n');
+        });
+        
+        document.getElementById('btnRotation').addEventListener('click', () => {
+            writeSerial(document.getElementById('selRotation').value + '\n');
+        });
+        
+        document.getElementById('btnUI').addEventListener('click', () => {
+            writeSerial(document.getElementById('selUI').value + '\n');
+        });
+        
+        document.getElementById('btnSpeed').addEventListener('click', () => {
+            writeSerial(document.getElementById('selSpeed').value + '\n');
+        });
+        
+        document.getElementById('btnSendCmd').addEventListener('click', () => {
+            const input = document.getElementById('customCmd');
+            if (input.value) {
+                writeSerial(input.value + '\n');
+                input.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
