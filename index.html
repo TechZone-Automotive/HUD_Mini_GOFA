@@ -397,12 +397,12 @@
         </div>
 
         <!-- ============================================== -->
-        <!-- PHẦN 1: SERIAL CONFIG (ĐƯA LÊN ĐẦU TIÊN)       -->
+        <!-- PHẦN 1: LẤY MAC VÀ ĐĂNG KÝ                     -->
         <!-- ============================================== -->
         <div class="card">
-            <h2>⚙️ Cấu hình thiết bị & Lấy MAC</h2>
+            <h2>⚙️ Lấy MAC và Đăng ký thiết bị GOFA</h2>
             <div class="alert-box info-box" style="margin-bottom: 20px;">
-                Cắm cáp USB vào HUD. Nút Cấu hình và Cập nhật Firmware dùng chung cổng kết nối. Nếu bạn vừa cập nhật phần mềm xong, hãy đóng thông báo cài đặt trước khi Kết nối Serial.
+                Cắm cáp USB vào HUD. Nút Kết nối Serial và Cập nhật Firmware dùng chung cổng kết nối. Nếu bạn vừa cập nhật phần mềm xong, hãy đóng thông báo cài đặt trước khi Kết nối Serial.
             </div>
             
             <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
@@ -411,7 +411,6 @@
             </div>
             
             <div id="config-controls" style="display: none; margin-top: 32px;">
-                
                 <!-- ĐỌC VÀ ĐĂNG KÝ MAC GOFA -->
                 <div class="config-section">
                     <h3>Đọc & Đăng ký MAC GOFA</h3>
@@ -432,88 +431,11 @@
                     
                     <a href="https://hud.platform.gofa.vn/guest/register" target="_blank" class="install-btn" style="padding: 12px; font-size: 14px;">ĐĂNG KÝ MAC GOFA</a>
                 </div>
-
-                <!-- 1. VERSION CHECK -->
-                <div class="config-section">
-                    <h3>Kiểm tra phiên bản Firmware</h3>
-                    <button id="btnCheckVersion" class="outline-btn">Gửi lệnh kiểm tra</button>
-                    <div id="versionDisplay">Chưa rõ phiên bản</div>
-                </div>
-                
-                <!-- 2. SCREEN ROTATION -->
-                <div class="config-section">
-                    <h3>Xoay màn hình</h3>
-                    <p>Chỉnh hướng hiển thị hình ảnh sao cho thuận mắt. Hướng 1-4 là xoay phẳng, 5-8 là lật ngược để hắt kính lái.</p>
-                    <div class="config-row">
-                        <label>Chọn hướng</label>
-                        <select id="selRotation">
-                            <option value="1">Hướng 1</option>
-                            <option value="2">Hướng 2</option>
-                            <option value="3">Hướng 3</option>
-                            <option value="4">Hướng 4</option>
-                            <option value="5">Hướng 5</option>
-                            <option value="6">Hướng 6</option>
-                            <option value="7">Hướng 7</option>
-                            <option value="8">Hướng 8</option>
-                        </select>
-                        <button id="btnRotation" class="outline-btn">Lưu</button>
-                    </div>
-                </div>
-                
-                <!-- 3. UI SELECTION -->
-                <div class="config-section">
-                    <h3>Giao diện hiển thị (UI)</h3>
-                    <p>Thay đổi kiểu Giao diện tốc độ trên màn hình HUD.</p>
-                    <div class="config-row">
-                        <label>Mẫu giao diện</label>
-                        <select id="selUI">
-                            <option value="U1">Giao diện 1</option>
-                            <option value="U2">Giao diện 2</option>
-                            <option value="U3">Giao diện 3</option>
-                            <option value="U4">Giao diện 4</option>
-                            <option value="U5">Giao diện 5</option>
-                            <option value="U6">Giao diện 6</option>
-                        </select>
-                        <button id="btnUI" class="outline-btn">Lưu</button>
-                    </div>
-                </div>
-                
-                <!-- 4. SPEED LIMIT WARNING -->
-                <div class="config-section">
-                    <h3>Cảnh báo tốc độ</h3>
-                    <p>Cài đặt độ lệch cảnh báo quá tốc độ: Báo sớm (-km/h) hoặc Báo trễ (+km/h).</p>
-                    <div class="config-row">
-                        <label>Ngưỡng lệch</label>
-                        <select id="selSpeed">
-                            <option value="-5">-5 km/h (Báo sớm)</option>
-                            <option value="-3">-3 km/h (Báo sớm)</option>
-                            <option value="0" selected>0 km/h (Chính xác)</option>
-                            <option value="3">+3 km/h (Báo trễ)</option>
-                            <option value="5">+5 km/h (Báo trễ)</option>
-                        </select>
-                        <button id="btnSpeed" class="outline-btn">Lưu</button>
-                    </div>
-                </div>
-                
-                <!-- 5. TERMINAL -->
-                <div class="config-section">
-                    <h3>Terminal (Gỡ lỗi)</h3>
-                    <div style="display: flex; gap: 12px;">
-                        <input type="text" id="customCmd" placeholder="Nhập lệnh (VD: VERSION, MAC)">
-                        <button id="btnSendCmd" class="outline-btn" style="white-space: nowrap; height: 44px;">Gửi lệnh</button>
-                    </div>
-                </div>
-                
-                <!-- 6. LOG -->
-                <div style="margin-top: 32px;">
-                    <h3 style="margin-bottom: 8px;">Nhật ký phản hồi</h3>
-                    <textarea id="serialLog" readonly placeholder="Phản hồi từ thiết bị sẽ hiển thị tại đây..."></textarea>
-                </div>
             </div>
         </div>
 
         <!-- ============================================== -->
-        <!-- PHẦN 2: CẬP NHẬT QUA CÁP USB (MẶC ĐỊNH V2)      -->
+        <!-- PHẦN 2: CẬP NHẬT QUA CÁP USB (MẶC ĐỊNH V2)       -->
         <!-- ============================================== -->
         <div class="card">
             <h2>📦 Cập nhật Firmware</h2>
@@ -669,8 +591,11 @@
         const encoder = new TextEncoder();
         const decoder = new TextDecoder();
         
+        // Hàm log được giữ lại để dùng chung cho ngầm nhưng không in ra DOM nếu không có UI
         function log(text, direction = 'info') {
             const logArea = document.getElementById('serialLog');
+            if (!logArea) return; // Bảo vệ: Nếu thẻ logArea bị xóa, bỏ qua việc in log
+            
             const prefix = direction === 'in' ? '> ' : direction === 'out' ? '< ' : '';
             logArea.value += prefix + text;
             if (!text.endsWith('\n')) logArea.value += '\n';
@@ -735,13 +660,19 @@
                     status.style.borderColor = 'var(--success-border)';
                     status.style.color = 'var(--success-text)';
                     controls.style.display = 'block';
-                    document.getElementById('serialLog').value = '';
-                    document.getElementById('versionDisplay').textContent = 'Chưa rõ phiên bản';
+                    
+                    // Reset các field (thêm check bảo vệ)
+                    const logArea = document.getElementById('serialLog');
+                    if (logArea) logArea.value = '';
+                    
+                    const versionDisp = document.getElementById('versionDisplay');
+                    if (versionDisp) versionDisp.textContent = 'Chưa rõ phiên bản';
+                    
                     document.getElementById('macDisplay').value = '';
                     document.getElementById('macDisplay').style.borderColor = 'var(--border)';
                     
                     (async () => {
-                        let readBuffer = ''; // FIX: Thêm bộ đệm để chống cắt chữ khi stream dữ liệu
+                        let readBuffer = ''; 
                         try {
                             while (true) {
                                 const { value, done } = await reader.read();
@@ -749,20 +680,10 @@
                                 
                                 readBuffer += decoder.decode(value, { stream: true });
                                 let lines = readBuffer.split('\n');
-                                readBuffer = lines.pop(); // Giữ lại phần chưa hoàn chỉnh (không có \n)
+                                readBuffer = lines.pop(); // Giữ lại phần chưa hoàn chỉnh
                                 
                                 for (let line of lines) {
-                                    log(line, 'in'); // In log từng dòng hoàn chỉnh
-                                    
-                                    // FIX VERSION: Nhận diện mọi tiền tố (V, G) hoặc không có tiền tố
-                                    const versionMatch = line.match(/[a-zA-Z]?\d+\.\d+\.\d+/);
-                                    if (versionMatch) {
-                                        const vDisp = document.getElementById('versionDisplay');
-                                        vDisp.textContent = `Thiết bị đang chạy: ${versionMatch[0]}`;
-                                        vDisp.style.borderColor = 'var(--success-border)';
-                                        vDisp.style.color = 'var(--success-text)';
-                                        vDisp.style.background = 'var(--success-bg)';
-                                    }
+                                    log(line, 'in'); 
 
                                     // Bắt thông tin MAC Address để hiển thị & Auto Copy
                                     const macMatch = line.match(/MAC:\s*([0-9A-F:]+)/i);
@@ -821,31 +742,6 @@
             document.getElementById('macDisplay').value = 'Đang đọc...';
             document.getElementById('macDisplay').style.color = 'var(--text-main)';
             writeSerial('MAC\n');
-        });
-
-        document.getElementById('btnCheckVersion').addEventListener('click', () => {
-            document.getElementById('versionDisplay').textContent = 'Đang đọc dữ liệu...';
-            writeSerial('VERSION\n');
-        });
-        
-        document.getElementById('btnRotation').addEventListener('click', () => {
-            writeSerial(document.getElementById('selRotation').value + '\n');
-        });
-        
-        document.getElementById('btnUI').addEventListener('click', () => {
-            writeSerial(document.getElementById('selUI').value + '\n');
-        });
-        
-        document.getElementById('btnSpeed').addEventListener('click', () => {
-            writeSerial(document.getElementById('selSpeed').value + '\n');
-        });
-        
-        document.getElementById('btnSendCmd').addEventListener('click', () => {
-            const input = document.getElementById('customCmd');
-            if (input.value) {
-                writeSerial(input.value + '\n');
-                input.value = '';
-            }
         });
     </script>
 </body>
